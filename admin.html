@@ -3,88 +3,98 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Sorteio Nova Paradiso</title>
+  <title>Admin - Sorteio Paradiso</title>
   <style>
-    body { font-family: Arial, sans-serif; background: #f4f4f9; padding: 20px; }
-    h1 { margin-top: 0; }
-    button { padding: 10px 16px; margin-right: 8px; margin-bottom: 12px; cursor: pointer; }
-    table { border-collapse: collapse; width: 100%; max-width: 100%; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 800px;
+      margin-bottom: 20px;
+    }
     th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #aaa;
       padding: 8px;
       text-align: left;
     }
-    th { background: #ddd; }
-    #resultado { font-size: 18px; margin-top: 12px; font-weight: bold; color: #007bff; }
+    th {
+      background: #007bff;
+      color: white;
+    }
+    button {
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #218838;
+    }
   </style>
 </head>
 <body>
-  <h1>Painel Administrativo</h1>
-  <button onclick="carregar()">Recarregar Lista</button>
-  <button onclick="sortear()">Sortear</button>
-  <button onclick="baixarCSV()">Baixar CSV</button>
-  <p id="resultado"></p>
-  <table id="tabela"></table>
+  <h1>Admin - Sorteio Paradiso</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Telefone</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+
+  <button id="sortear">Sortear</button>
+  <h2 id="resultado"></h2>
 
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbxWYBwe2fk_Hvkpi4zPEc7lC_XpVHsFtvYcNY3eV5zabX5FEF_NRBNjkVum3jXQm_N6/exec";
 
-    async function carregar() {
-      const res = await fetch(scriptURL);
-      const dados = await res.json();
-      const tabela = document.getElementById("tabela");
-      tabela.innerHTML = "";
-      // Cabeçalho
-      const header = document.createElement("tr");
-      dados[0].forEach(col => {
-        const th = document.createElement("th");
-        th.textContent = col;
-        header.appendChild(th);
-      });
-      tabela.appendChild(header);
-      // Dados
-      dados.slice(1).forEach(linha => {
-        const tr = document.createElement("tr");
-        linha.forEach(col => {
-          const td = document.createElement("td");
-          td.textContent = col;
-          tr.appendChild(td);
-        });
-        tabela.appendChild(tr);
-      });
-    }
+    const tabela = document.getElementById("tabela");
+    const resultado = document.getElementById("resultado");
+    const botaoSortear = document.getElementById("sortear");
+    let cadastros = [];
 
-    function sortear() {
-      const linhas = document.querySelectorAll("#tabela tr");
-      if (linhas.length <= 1) {
-        alert("Nenhum participante cadastrado.");
+    // Carrega os dados da planilha
+    fetch(scriptURL)
+      .then(res => res.json())
+      .then(data => {
+        cadastros = data;
+        data.forEach(cadastro => {
+          const linha = document.createElement("tr");
+          linha.innerHTML = `<td>${cadastro.nome}</td>
+                             <td>${cadastro.email}</td>
+                             <td>${cadastro.telefone}</td>
+                             <td>${cadastro.data}</td>`;
+          tabela.appendChild(linha);
+        });
+      })
+      .catch(err => console.error("Erro ao carregar dados:", err));
+
+    // Função para sortear
+    botaoSortear.addEventListener("click", () => {
+      if(cadastros.length === 0){
+        resultado.innerText = "Nenhum cadastro disponível para sortear!";
         return;
       }
-      const idx = Math.floor(Math.random() * (linhas.length - 1)) + 1;
-      const vencedor = linhas[idx].children[0].textContent;
-      document.getElementById("resultado").innerText = "🎉 Vencedor: " + vencedor;
-    }
-
-    function baixarCSV() {
-      const rows = document.querySelectorAll("table tr");
-      const csv = [];
-      rows.forEach(row => {
-        const cols = row.querySelectorAll("td, th");
-        const linha = [];
-        cols.forEach(col => linha.push(col.innerText));
-        csv.push(linha.join(","));
-      });
-      const blob = new Blob([csv.join("\n")], { type: "text/csv" });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "participantes.csv";
-      a.click();
-    }
-
-    // Carrega imediatamente ao abrir
-    carregar();
+      const vencedor = cadastros[Math.floor(Math.random() * cadastros.length)];
+      resultado.innerText = `🎉 Vencedor: ${vencedor.nome} (${vencedor.email}) 🎉`;
+    });
   </script>
 </body>
 </html>
-
