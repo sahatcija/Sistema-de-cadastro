@@ -13,9 +13,7 @@
       align-items: center;
       padding: 20px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
+    h1 { margin-bottom: 20px; }
     table {
       border-collapse: collapse;
       width: 100%;
@@ -27,10 +25,7 @@
       padding: 8px;
       text-align: left;
     }
-    th {
-      background: #007bff;
-      color: white;
-    }
+    th { background: #007bff; color: white; }
     button {
       padding: 10px 20px;
       background: #28a745;
@@ -40,9 +35,7 @@
       cursor: pointer;
       font-weight: bold;
     }
-    button:hover {
-      background: #218838;
-    }
+    button:hover { background: #218838; }
   </style>
 </head>
 <body>
@@ -63,14 +56,13 @@
   <h2 id="resultado"></h2>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxWYBwe2fk_Hvkpi4zPEc7lC_XpVHsFtvYcNY3eV5zabX5FEF_NRBNjkVum3jXQm_N6/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw-VHmw5bpeaV31ZP5rFp5n7H5twdev8dm6fdBwowPYiEmMRqRjBwqZunMaj3a-QaaZ8w/exec";
 
     const tabela = document.getElementById("tabela");
     const resultado = document.getElementById("resultado");
     const botaoSortear = document.getElementById("sortear");
     let cadastros = [];
 
-    // Carrega os dados da planilha
     fetch(scriptURL)
       .then(res => res.json())
       .then(data => {
@@ -86,7 +78,6 @@
       })
       .catch(err => console.error("Erro ao carregar dados:", err));
 
-    // Função para sortear
     botaoSortear.addEventListener("click", () => {
       if(cadastros.length === 0){
         resultado.innerText = "Nenhum cadastro disponível para sortear!";
