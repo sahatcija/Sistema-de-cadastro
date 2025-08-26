@@ -54,9 +54,7 @@
     <h1>Cadastro para Sorteio</h1>
     <form id="form">
       <input type="text" name="nome" placeholder="Nome Completo" required>
-
       <input type="email" name="email" placeholder="E-mail" required>
-
       <label for="pais">Escolha seu país:</label>
       <select id="pais">
         <option value="+55">Brasil</option>
@@ -65,22 +63,19 @@
         <option value="+49">Alemanha</option>
         <option value="+33">França</option>
       </select>
-
       <input type="tel" id="telefone" placeholder="Digite seu telefone" required>
-
       <button type="submit">Enviar</button>
     </form>
     <p id="msg"></p>
   </div>
 
   <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbxWYBwe2fk_Hvkpi4zPEc7lC_XpVHsFtvYcNY3eV5zabX5FEF_NRBNjkVum3jXQm_N6/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbw-VHmw5bpeaV31ZP5rFp5n7H5twdev8dm6fdBwowPYiEmMRqRjBwqZunMaj3a-QaaZ8w/exec";
 
     const paisSelect = document.getElementById("pais");
     const telefoneInput = document.getElementById("telefone");
     const form = document.getElementById("form");
 
-    // Atualiza placeholder do telefone com prefixo do país
     paisSelect.addEventListener("change", () => {
       telefoneInput.value = "";
       telefoneInput.placeholder = "Digite seu telefone (somente números) - " + paisSelect.value;
@@ -94,14 +89,12 @@
       const telefone = telefoneInput.value.trim();
       const prefixo = paisSelect.value;
 
-      // Validação do email
       if(!email.includes("@")) {
         document.getElementById("msg").innerText = "E-mail inválido!";
         document.getElementById("msg").style.color = "red";
         return;
       }
 
-      // Validação do telefone: apenas números
       const telefoneRegex = /^\d{8,}$/;
       if(!telefoneRegex.test(telefone)) {
         document.getElementById("msg").innerText = "Telefone inválido! Digite apenas os números após o prefixo.";
@@ -135,5 +128,3 @@
   </script>
 </body>
 </html>
-
-
