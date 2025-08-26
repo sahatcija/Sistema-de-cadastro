@@ -8,7 +8,6 @@
     body {
       margin: 0;
       font-family: Arial, sans-serif;
-      /* Fundo editável: basta trocar o arquivo fundo.jpg na pasta */
       background: url("fundo.jpg") no-repeat center center fixed;
       background-size: cover;
       display: flex;
@@ -25,7 +24,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
     h1 { text-align: center; margin-bottom: 12px; }
-    input, button {
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin: 6px 0;
@@ -45,20 +44,30 @@
     #msg {
       text-align: center;
       margin-top: 12px;
-      color: green;
       font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Arte do evento: basta trocar o arquivo arte_evento.jpg na pasta -->
     <img src="arte_evento.jpg" alt="Arte do Evento" style="width: 100%; border-radius: 10px; margin-bottom: 12px;">
     <h1>Cadastro para Sorteio</h1>
     <form id="form">
       <input type="text" name="nome" placeholder="Nome Completo" required>
+
       <input type="email" name="email" placeholder="E-mail" required>
-      <input type="tel" name="telefone" placeholder="Telefone" required>
+
+      <label for="pais">Escolha seu país:</label>
+      <select id="pais">
+        <option value="+55">Brasil</option>
+        <option value="+1">EUA</option>
+        <option value="+44">Reino Unido</option>
+        <option value="+49">Alemanha</option>
+        <option value="+33">França</option>
+      </select>
+
+      <input type="tel" id="telefone" placeholder="Digite seu telefone" required>
+
       <button type="submit">Enviar</button>
     </form>
     <p id="msg"></p>
@@ -67,20 +76,55 @@
   <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbyidZRcRJ-IZexNBKaYL5-nCokNQzDykqd1p_XxOfAya27rqQMIMIDJFhBxKtUK_Wro/exec";
 
-    document.getElementById("form").addEventListener("submit", function(e) {
+    const paisSelect = document.getElementById("pais");
+    const telefoneInput = document.getElementById("telefone");
+    const form = document.getElementById("form");
+
+    // Atualiza placeholder do telefone com prefixo do país
+    paisSelect.addEventListener("change", () => {
+      telefoneInput.value = "";
+      telefoneInput.placeholder = "Digite seu telefone (somente números) - " + paisSelect.value;
+    });
+
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
-      const data = {
-        nome: this.nome.value,
-        email: this.email.value,
-        telefone: this.telefone.value
-      };
+
+      const nome = this.nome.value.trim();
+      const email = this.email.value.trim();
+      const telefone = telefoneInput.value.trim();
+      const prefixo = paisSelect.value;
+
+      // Validação do email
+      if(!email.includes("@")) {
+        document.getElementById("msg").innerText = "E-mail inválido!";
+        document.getElementById("msg").style.color = "red";
+        return;
+      }
+
+      // Validação do telefone: apenas números
+      const telefoneRegex = /^\d{8,}$/;
+      if(!telefoneRegex.test(telefone)) {
+        document.getElementById("msg").innerText = "Telefone inválido! Digite apenas os números após o prefixo.";
+        document.getElementById("msg").style.color = "red";
+        return;
+      }
+
+      const data = { nome, email, telefone: prefixo + telefone };
+
       fetch(scriptURL, {
         method: "POST",
         body: JSON.stringify(data)
       })
-      .then(res => {
-        document.getElementById("msg").innerText = "Cadastro realizado com sucesso!";
-        this.reset();
+      .then(res => res.json())
+      .then(resJson => {
+        if(resJson.status === "ok") {
+          document.getElementById("msg").innerText = "Cadastro realizado com sucesso!";
+          document.getElementById("msg").style.color = "green";
+          form.reset();
+        } else {
+          document.getElementById("msg").innerText = resJson.msg;
+          document.getElementById("msg").style.color = "red";
+        }
       })
       .catch(err => {
         console.error(err);
