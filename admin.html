@@ -7,43 +7,42 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      background: #fff;
+      color: #333;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 20px;
     }
-    h1 {
-      margin-bottom: 20px;
-    }
+    h1 { margin-bottom: 15px; }
     table {
       border-collapse: collapse;
       width: 100%;
-      max-width: 800px;
-      margin-bottom: 20px;
+      max-width: 700px;
+      margin-bottom: 15px;
     }
     th, td {
-      border: 1px solid #aaa;
-      padding: 8px;
+      border: 1px solid #ccc;
+      padding: 6px 10px;
       text-align: left;
+      font-size: 14px;
     }
     th {
-      background: #007bff;
-      color: white;
+      background: #eee;
     }
     button {
-      padding: 10px 20px;
-      background: #28a745;
-      color: white;
+      padding: 6px 12px;
+      margin: 3px;
       border: none;
-      border-radius: 6px;
+      border-radius: 4px;
       cursor: pointer;
-      font-weight: bold;
-      margin: 5px;
+      font-size: 14px;
     }
-    button:hover {
-      background: #218838;
-    }
+    #sortear { background: #28a745; color: white; }
+    #recarregar { background: #007bff; color: white; }
+    #exportar { background: #6c757d; color: white; }
+    button:hover { opacity: 0.8; }
+    #resultado { margin-top: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -61,8 +60,11 @@
     <tbody id="tabela"></tbody>
   </table>
 
-  <button id="sortear">Sortear</button>
-  <button id="exportar">Exportar CSV</button>
+  <div>
+    <button id="sortear">Sortear</button>
+    <button id="recarregar">Recarregar Lista</button>
+    <button id="exportar">Exportar CSV</button>
+  </div>
   <h2 id="resultado"></h2>
 
   <script>
@@ -70,24 +72,31 @@
     const tabela = document.getElementById("tabela");
     const resultado = document.getElementById("resultado");
     const botaoSortear = document.getElementById("sortear");
+    const botaoRecarregar = document.getElementById("recarregar");
     const botaoExportar = document.getElementById("exportar");
     let cadastros = [];
 
-    // Carrega os cadastros
-    fetch(scriptURL)
-      .then(res => res.json())
-      .then(data => {
-        cadastros = data;
-        data.forEach(cadastro => {
-          const linha = document.createElement("tr");
-          linha.innerHTML = `<td>${cadastro.nome}</td>
-                             <td>${cadastro.email}</td>
-                             <td>${cadastro.telefone}</td>
-                             <td>${cadastro.data}</td>`;
-          tabela.appendChild(linha);
-        });
-      })
-      .catch(err => console.error("Erro ao carregar dados:", err));
+    // Função para carregar a tabela
+    function carregarTabela() {
+      tabela.innerHTML = "";
+      fetch(scriptURL)
+        .then(res => res.json())
+        .then(data => {
+          cadastros = data;
+          data.forEach(c => {
+            const linha = document.createElement("tr");
+            linha.innerHTML = `<td>${c.nome}</td>
+                               <td>${c.email}</td>
+                               <td>${c.telefone}</td>
+                               <td>${c.data}</td>`;
+            tabela.appendChild(linha);
+          });
+        })
+        .catch(err => console.error("Erro ao carregar dados:", err));
+    }
+
+    // Inicializa tabela
+    carregarTabela();
 
     // Sortear vencedor
     botaoSortear.addEventListener("click", () => {
@@ -99,6 +108,9 @@
       resultado.innerText = `🎉 Vencedor: ${vencedor.nome} (${vencedor.email}) 🎉`;
     });
 
+    // Recarregar lista
+    botaoRecarregar.addEventListener("click", carregarTabela);
+
     // Exportar CSV
     botaoExportar.addEventListener("click", () => {
       if(cadastros.length === 0){
@@ -109,7 +121,6 @@
       cadastros.forEach(c => {
         csv += `"${c.nome}","${c.email}","${c.telefone}","${c.data}"\n`;
       });
-
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
