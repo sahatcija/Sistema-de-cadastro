@@ -22,8 +22,9 @@
       max-width: 400px;
       width: 90%;
       box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      text-align: center;
     }
-    h1 { text-align: center; margin-bottom: 12px; }
+    h1 { margin-bottom: 12px; }
     input, select, button {
       width: 100%;
       padding: 10px;
@@ -42,9 +43,9 @@
       background: #0056b3;
     }
     #msg {
-      text-align: center;
-      margin-top: 12px;
+      margin-top: 16px;
       font-weight: bold;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -52,9 +53,12 @@
   <div class="container">
     <img src="arte_evento.jpg" alt="Arte do Evento" style="width: 100%; border-radius: 10px; margin-bottom: 12px;">
     <h1>Cadastro para Sorteio</h1>
+
+    <!-- Formulário -->
     <form id="form">
       <input type="text" name="nome" placeholder="Nome Completo" required>
       <input type="email" name="email" placeholder="E-mail" required>
+
       <label for="pais">Escolha seu país:</label>
       <select id="pais">
         <option value="+55">Brasil</option>
@@ -63,9 +67,13 @@
         <option value="+49">Alemanha</option>
         <option value="+33">França</option>
       </select>
+
       <input type="tel" id="telefone" placeholder="Digite seu telefone" required>
+
       <button type="submit">Enviar</button>
     </form>
+
+    <!-- Mensagem -->
     <p id="msg"></p>
   </div>
 
@@ -75,6 +83,7 @@
     const paisSelect = document.getElementById("pais");
     const telefoneInput = document.getElementById("telefone");
     const form = document.getElementById("form");
+    const msg = document.getElementById("msg");
 
     paisSelect.addEventListener("change", () => {
       telefoneInput.value = "";
@@ -90,15 +99,15 @@
       const prefixo = paisSelect.value;
 
       if(!email.includes("@")) {
-        document.getElementById("msg").innerText = "E-mail inválido!";
-        document.getElementById("msg").style.color = "red";
+        msg.innerText = "E-mail inválido!";
+        msg.style.color = "red";
         return;
       }
 
       const telefoneRegex = /^\d{8,}$/;
       if(!telefoneRegex.test(telefone)) {
-        document.getElementById("msg").innerText = "Telefone inválido! Digite apenas os números após o prefixo.";
-        document.getElementById("msg").style.color = "red";
+        msg.innerText = "Telefone inválido! Digite apenas os números após o prefixo.";
+        msg.style.color = "red";
         return;
       }
 
@@ -111,22 +120,20 @@
       .then(res => res.json())
       .then(resJson => {
         if(resJson.status === "ok") {
-          document.getElementById("msg").innerText = "Cadastro realizado com sucesso!";
-          document.getElementById("msg").style.color = "green";
-          form.reset();
+          form.style.display = "none"; // esconde o formulário
+          msg.innerText = "✅ Obrigado por participar! Seu cadastro foi enviado com sucesso.";
+          msg.style.color = "green";
         } else {
-          document.getElementById("msg").innerText = resJson.msg;
-          document.getElementById("msg").style.color = "red";
+          msg.innerText = resJson.msg;
+          msg.style.color = "red";
         }
       })
       .catch(err => {
         console.error(err);
-        document.getElementById("msg").innerText = "Erro ao enviar. Tente novamente.";
-        document.getElementById("msg").style.color = "red";
+        msg.innerText = "Erro ao enviar. Tente novamente.";
+        msg.style.color = "red";
       });
     });
   </script>
 </body>
 </html>
-
-
